@@ -232,6 +232,11 @@ namespace vrpn_client_ros
         tracker->twist_pub_ = nh->create_publisher<geometry_msgs::msg::TwistStamped>("twist", 1);
       }
 
+      if (!tracker->odom_pub_)
+      {
+        tracker->odom_pub_ = nh->create_publisher<nav_msgs::msg::Odometry>("odom", 1);
+      }
+
       
       double dt_nsec = (tracker->pose_msg_.header.stamp.nanosec*1.0e-9 - tracker->previous_pose_msg_.header.stamp.nanosec*1.0e-9);
       double dt_sec = (tracker->pose_msg_.header.stamp.sec - tracker->previous_pose_msg_.header.stamp.sec) + dt_nsec;
@@ -289,6 +294,24 @@ namespace vrpn_client_ros
       tracker->accel_msg_.accel.angular.z = (tracker->twist_msg_.twist.angular.z - tracker->previous_twist_msg_.twist.angular.z)*1e9/dt_nsec;
 
 
+      geometry_msgs::msg::TwistWithCovariance twist_cov;
+      geometry_msgs::msg::PoseWithCovariance  pose_cov;
+
+      twist_cov.twist = tracker->twist_msg_.twist;
+      twist_cov.covariance.fill(0.0);
+
+      pose_cov.pose = tracker->pose_msg_.pose;
+      pose_cov.covariance.fill(0.0);
+
+      nav_msgs::msg::Odometry odom_msg_;
+
+      odom_msg_.header = tracker->pose_msg_.header;
+      odom_msg_.child_frame_id = tracker->tracker_name;
+
+      odom_msg_.pose  = pose_cov;
+      odom_msg_.twist = twist_cov;
+      
+      tracker->odom_pub_->publish(odom_msg_);
       tracker->accel_msg_.header = tracker->pose_msg_.header;
 
       tracker->accel_pub_->publish(tracker->accel_msg_);

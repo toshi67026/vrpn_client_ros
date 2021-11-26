@@ -43,6 +43,7 @@
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/accel_stamped.hpp"
 #include <geometry_msgs/msg/transform_stamped.h>
+#include "nav_msgs/msg/odometry.hpp"
 
 #include <vrpn_Tracker.h>
 #include <vrpn_Connection.h>
@@ -85,6 +86,7 @@ namespace vrpn_client_ros
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
     rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
     rclcpp::Publisher<geometry_msgs::msg::AccelStamped>::SharedPtr accel_pub_;
+    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
 
     rclcpp::Node::SharedPtr output_nh_;
 
