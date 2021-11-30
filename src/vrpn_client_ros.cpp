@@ -278,6 +278,12 @@ namespace vrpn_client_ros
 
       tracker->twist_msg_ = tf2::toMsg(kdl_twist_msg_);
 
+      tracker->last_quat = quat;
+      
+      if (std::isnan(tracker->twist_msg_.twist.linear.x)){
+        return;
+      }
+      
       tracker->twist_pub_->publish(tracker->twist_msg_);
 
       if (!tracker->accel_pub_)
@@ -316,7 +322,7 @@ namespace vrpn_client_ros
 
       tracker->accel_pub_->publish(tracker->accel_msg_);
 
-      tracker->last_quat = quat;
+      
     }
 
     tracker->previous_message_arrived_ = true;
