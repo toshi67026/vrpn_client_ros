@@ -102,7 +102,7 @@ namespace vrpn_client_ros
     geometry_msgs::msg::TwistStamped previous_twist_msg_;
     geometry_msgs::msg::AccelStamped accel_msg_;
     geometry_msgs::msg::TransformStamped  transform_stamped_;
-
+    
     void init(std::string tracker_name, rclcpp::Node::SharedPtr nh, bool create_mainloop_timer);
 
     static void VRPN_CALLBACK handle_pose(void *userData, const vrpn_TRACKERCB tracker_pose);
@@ -139,7 +139,12 @@ namespace vrpn_client_ros
 
     std::string host_;
     rclcpp::Node::SharedPtr output_nh_;
-
+    
+      
+    rclcpp::Parameter rigid_body_whitelist;
+    std::unordered_set<std::string> name_whitelist_;
+    
+    
     /**
      * Underlying VRPN connection object
      */

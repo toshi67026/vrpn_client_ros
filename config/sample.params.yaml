@@ -7,3 +7,4 @@ vrpn_client_node:
     broadcast_tf: true
     refresh_tracker_frequency: 0.2
     update_frequency: 240.0
+    rigid_body_whitelist: ["shadow"]
