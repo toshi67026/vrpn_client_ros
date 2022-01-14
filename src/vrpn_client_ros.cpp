@@ -123,7 +123,7 @@ namespace vrpn_client_ros
     nh->get_parameter("use_server_time", use_server_time_);
     nh->get_parameter("broadcast_tf", broadcast_tf_);
     nh->get_parameter("calculate_twist_and_accel", calculate_twist_and_accel_);
-    
+
     previous_message_arrived_ = false;
 
     pose_msg_.header.frame_id = frame_id;
@@ -412,7 +412,8 @@ namespace vrpn_client_ros
   
   }
 
-  VrpnClientRos::VrpnClientRos(rclcpp::Node::SharedPtr nh, rclcpp::Node::SharedPtr private_nh)
+  VrpnClientRos::VrpnClientRos(rclcpp::Node::SharedPtr nh, rclcpp::Node::SharedPtr private_nh):
+  rigid_body_whitelist("rigib_body_whitelist", std::vector<std::string>())
   {
     output_nh_ = private_nh;
 
@@ -427,6 +428,13 @@ namespace vrpn_client_ros
 
     std::vector<std::string> param_tracker_names;
     nh->declare_parameter("trackers", param_tracker_names);
+
+    nh->declare_parameter("rigid_body_whitelist", std::vector<std::string>());
+    nh->get_parameter("rigid_body_whitelist", rigid_body_whitelist);
+    
+    std::vector<std::string> whitelist_temp = rigid_body_whitelist.as_string_array();
+    std::copy(whitelist_temp.begin(), whitelist_temp.end(), std::inserter(name_whitelist_, name_whitelist_.end()));
+
 
 
     host_ = getHostStringFromParams(private_nh);
@@ -498,7 +506,16 @@ namespace vrpn_client_ros
     {
       if (trackers_.count(connection_->sender_name(i)) == 0 && name_blacklist_.count(connection_->sender_name(i)) == 0)
       {
+        // If name whitelist is empty then we use only blacklist
+        // But if there are some values in whitelist, then we use only names from whitelist
         RCLCPP_INFO_STREAM(output_nh_->get_logger(), "Found new sender: " << connection_->sender_name(i));
+        if (name_whitelist_.count(connection_->sender_name(i)) == 0 && 
+            name_whitelist_.size() != 0)
+        {
+          i++;
+          continue;
+        }
+        RCLCPP_INFO_STREAM(output_nh_->get_logger(), "Connected sender: " << connection_->sender_name(i));
         trackers_.insert(std::make_pair(connection_->sender_name(i),
                                         std::make_shared<VrpnTrackerRos>(connection_->sender_name(i), connection_,
                                                                            output_nh_)));
