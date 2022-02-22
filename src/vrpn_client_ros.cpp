@@ -170,6 +170,7 @@ namespace vrpn_client_ros
     if (!tracker->pose_pub_)
     {
       tracker->pose_pub_ = nh->create_publisher<geometry_msgs::msg::PoseStamped>("pose", 1);
+      tracker->pose_cov_pub_ = nh->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>("pose_cov", 1);
     }
 
     if (tracker->use_server_time_)
@@ -304,10 +305,14 @@ namespace vrpn_client_ros
       geometry_msgs::msg::PoseWithCovariance  pose_cov;
 
       twist_cov.twist = tracker->twist_msg_.twist;
-      twist_cov.covariance.fill(0.0);
 
       pose_cov.pose = tracker->pose_msg_.pose;
-      pose_cov.covariance.fill(0.0);
+      twist_cov.covariance.fill(0.00001);
+      pose_cov.covariance.fill(0.00001);
+
+      geometry_msgs::msg::PoseWithCovarianceStamped pose_cov_stamped_msg;
+      pose_cov_stamped_msg.pose = pose_cov;
+      pose_cov_stamped_msg.header = tracker->pose_msg_.header;
 
       nav_msgs::msg::Odometry odom_msg_;
 
@@ -318,9 +323,10 @@ namespace vrpn_client_ros
       odom_msg_.twist = twist_cov;
       
       tracker->odom_pub_->publish(odom_msg_);
+      tracker->pose_cov_pub_->publish(pose_cov_stamped_msg);
       tracker->accel_msg_.header = tracker->pose_msg_.header;
 
-      tracker->accel_pub_->publish(tracker->accel_msg_);
+      // tracker->accel_pub_->publish(tracker->accel_msg_);
 
       
     }

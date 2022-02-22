@@ -40,6 +40,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/accel_stamped.hpp"
 #include <geometry_msgs/msg/transform_stamped.h>
@@ -84,6 +85,7 @@ namespace vrpn_client_ros
   private:
     TrackerRemotePtr tracker_remote_;
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr pose_cov_pub_;
     rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
     rclcpp::Publisher<geometry_msgs::msg::AccelStamped>::SharedPtr accel_pub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
